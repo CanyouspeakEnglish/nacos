@@ -27,11 +27,12 @@ import com.alibaba.nacos.sys.env.EnvUtil;
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
 public class ConfigChangePublisher {
-    
+
     /**
      * Notify ConfigChange.
      *
      * @param event ConfigDataChangeEvent instance.
+     * 通知变更
      */
     public static void notifyConfigChange(ConfigDataChangeEvent event) {
         if (PropertyUtil.isEmbeddedStorage() && !EnvUtil.getStandaloneMode()) {
@@ -39,5 +40,5 @@ public class ConfigChangePublisher {
         }
         NotifyCenter.publishEvent(event);
     }
-    
+
 }

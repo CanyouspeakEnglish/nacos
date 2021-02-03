@@ -25,23 +25,31 @@ import org.apache.commons.lang3.StringUtils;
  * @author Nacos
  */
 public class ConfigDataChangeEvent extends Event {
-    
+
     public final boolean isBeta;
-    
+
     public final String dataId;
-    
+
     public final String group;
-    
+
     public final String tenant;
-    
+
     public final String tag;
-    
+
     public final long lastModifiedTs;
-    
+
     public ConfigDataChangeEvent(String dataId, String group, long gmtModified) {
         this(false, dataId, group, gmtModified);
     }
-    
+
+    /**
+     * 配置变更的事件
+     * @param isBeta
+     * @param dataId
+     * @param group
+     * @param tenant
+     * @param gmtModified
+     */
     public ConfigDataChangeEvent(boolean isBeta, String dataId, String group, String tenant, long gmtModified) {
         if (null == dataId || null == group) {
             throw new IllegalArgumentException("dataId is null or group is null");
@@ -53,11 +61,11 @@ public class ConfigDataChangeEvent extends Event {
         this.tag = null;
         this.lastModifiedTs = gmtModified;
     }
-    
+
     public ConfigDataChangeEvent(boolean isBeta, String dataId, String group, long gmtModified) {
         this(isBeta, dataId, group, StringUtils.EMPTY, gmtModified);
     }
-    
+
     public ConfigDataChangeEvent(boolean isBeta, String dataId, String group, String tenant, String tag,
             long gmtModified) {
         if (null == dataId || null == group) {
@@ -70,5 +78,5 @@ public class ConfigDataChangeEvent extends Event {
         this.tag = tag;
         this.lastModifiedTs = gmtModified;
     }
-    
+
 }
