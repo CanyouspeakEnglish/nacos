@@ -81,9 +81,11 @@ public class AsyncNotifyService {
                     // In fact, any type of queue here can be
                     Queue<NotifySingleTask> queue = new LinkedList<NotifySingleTask>();
                     for (Member member : ipList) {
+                        //获取需要同步的服务
                         queue.add(new NotifySingleTask(dataId, group, tenant, tag, dumpTs, member.getAddress(),
                                 evt.isBeta));
                     }
+                    //包装任务
                     ConfigExecutor.executeAsyncNotify(new AsyncTask(nacosAsyncRestTemplate, queue));
                 }
             }
@@ -138,6 +140,7 @@ public class AsyncNotifyService {
                         if (task.isBeta) {
                             header.addParam("isBeta", "true");
                         }
+                        //失败了重新执行 在callback中
                         restTemplate.get(task.url, header, Query.EMPTY, String.class, new AsyncNotifyCallBack(task));
                     }
                 }

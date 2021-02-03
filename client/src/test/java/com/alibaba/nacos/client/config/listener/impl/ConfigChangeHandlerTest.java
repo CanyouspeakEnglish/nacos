@@ -56,7 +56,9 @@ public class ConfigChangeHandlerTest {
                 System.out.println(namingEvent.getServiceName());
 
             });
-           /* ConfigService configService = NacosFactory.createConfigService("118.190.155.155:8848");
+            namingService.getAllInstances("test");
+
+            ConfigService configService = NacosFactory.createConfigService("118.190.155.155:8848");
             configService.getConfig("com.lzx.test.config","lzx-group",10000);
             configService.addListener("com.lzx.test.config", "lzx-group", new Listener() {
                 @Override
@@ -68,7 +70,7 @@ public class ConfigChangeHandlerTest {
                 public void receiveConfigInfo(String configInfo) {
                     System.out.println("--------------------"+configInfo);
                 }
-            });*/
+            });
             System.in.read();
         } catch (NacosException e) {
             e.printStackTrace();

@@ -452,6 +452,14 @@ public class NacosNamingService implements NamingService {
         subscribe(serviceName, Constants.DEFAULT_GROUP, clusters, listener);
     }
 
+    /**
+     * 订阅
+     * @param serviceName name of service
+     * @param groupName   group of service
+     * @param clusters    list of cluster
+     * @param listener    event listener
+     * @throws NacosException
+     */
     @Override
     public void subscribe(String serviceName, String groupName, List<String> clusters, EventListener listener)
             throws NacosException {
