@@ -81,6 +81,7 @@ import java.util.zip.GZIPOutputStream;
  *
  * @author nacos
  * @deprecated will remove in 1.4.x
+ * 选举
  */
 @Deprecated
 @DependsOn("ProtocolManager")
@@ -469,6 +470,19 @@ public class RaftCore implements Closeable {
         datums.clear();
     }
 
+    public static void main(String[] args) {
+        RaftPeer raftPeer = new RaftPeer();
+        long  leaderDueMs =  raftPeer.leaderDueMs;
+        System.out.println( GlobalExecutor.LEADER_TIMEOUT_MS);
+        System.out.println(leaderDueMs);
+        leaderDueMs -= GlobalExecutor.TICK_PERIOD_MS;
+        System.out.println(leaderDueMs);
+
+    }
+
+    /**
+     * 选举
+     */
     public class MasterElection implements Runnable {
 
         @Override
@@ -514,6 +528,7 @@ public class RaftCore implements Closeable {
             Map<String, String> params = new HashMap<>(1);
             params.put("vote", JacksonUtils.toJson(local));
             for (final String server : peers.allServersWithoutMySelf()) {
+                ///raft/vote
                 final String url = buildUrl(server, API_VOTE);
                 try {
                     HttpClient.asyncHttpPost(url, null, params, new Callback<String>() {
@@ -527,7 +542,7 @@ public class RaftCore implements Closeable {
                             RaftPeer peer = JacksonUtils.toObj(result.getData(), RaftPeer.class);
 
                             Loggers.RAFT.info("received approve from peer: {}", JacksonUtils.toJson(peer));
-
+                            //宣票
                             peers.decideLeader(peer);
 
                         }
@@ -551,7 +566,7 @@ public class RaftCore implements Closeable {
 
     /**
      * Received vote.
-     *
+     * 接收选票
      * @param remote remote raft peer of vote information
      * @return self-peer information
      */
@@ -559,11 +574,13 @@ public class RaftCore implements Closeable {
         if (stopWork) {
             throw new IllegalStateException("old raft protocol already stop work");
         }
+        //不包含服务直接返回
         if (!peers.contains(remote)) {
             throw new IllegalStateException("can not find peer: " + remote.ip);
         }
-
+        //获取本地服务
         RaftPeer local = peers.get(NetUtils.localServer());
+        //判断周期
         if (remote.term.get() <= local.term.get()) {
             String msg = "received illegitimate vote" + ", voter-term:" + remote.term + ", votee-term:" + local.term;
 
@@ -571,14 +588,16 @@ public class RaftCore implements Closeable {
             if (StringUtils.isEmpty(local.voteFor)) {
                 local.voteFor = local.ip;
             }
-
+            //返回自己
             return local;
         }
 
         local.resetLeaderDue();
-
+        //将自己变成FOLLOWER
         local.state = RaftPeer.State.FOLLOWER;
+        //票变成远程ip
         local.voteFor = remote.ip;
+        //设置远程的周期
         local.term.set(remote.term.get());
 
         Loggers.RAFT.info("vote {} as leader, term: {}", remote.ip, remote.term);

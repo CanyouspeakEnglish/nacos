@@ -40,28 +40,28 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Deprecated
 @Component
 public class RaftListener implements SmartApplicationListener {
-    
+
     private final ServerMemberManager memberManager;
-    
+
     private final ClusterVersionJudgement versionJudgement;
-    
+
     private volatile boolean stopUpdate = false;
-    
+
     /**
      * Avoid multithreading mode. Old Raft information data cannot be properly removed.
      */
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    
+
     private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
-    
+
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
-    
+
     public RaftListener(ServerMemberManager memberManager, ClusterVersionJudgement versionJudgement) {
         this.memberManager = memberManager;
         this.versionJudgement = versionJudgement;
         this.init();
     }
-    
+
     private void init() {
         this.versionJudgement.registerObserver(isAllNewVersion -> {
             final Lock lock = this.writeLock;
@@ -76,12 +76,16 @@ public class RaftListener implements SmartApplicationListener {
             }
         }, -2);
     }
-    
+
     @Override
     public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
         return BaseRaftEvent.class.isAssignableFrom(eventType);
     }
-    
+
+    /**
+     * 状态改变事件
+     * @param event
+     */
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         final Lock lock = readLock;
@@ -103,7 +107,7 @@ public class RaftListener implements SmartApplicationListener {
             lock.unlock();
         }
     }
-    
+
     void removeOldRaftMetadata() {
         Loggers.RAFT.warn("start to move old raft protocol metadata");
         Member self = memberManager.getSelf();
