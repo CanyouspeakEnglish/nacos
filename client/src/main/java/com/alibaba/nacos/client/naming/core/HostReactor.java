@@ -53,7 +53,7 @@ import static com.alibaba.nacos.client.utils.LogUtils.NAMING_LOGGER;
 
 /**
  * Host reactor.
- *
+ * 存放实例
  * @author xuanyin
  */
 public class HostReactor implements Closeable {
@@ -109,8 +109,11 @@ public class HostReactor implements Closeable {
         }
 
         this.updatingMap = new ConcurrentHashMap<String, Object>();
+        //故障切花响应
         this.failoverReactor = new FailoverReactor(this, cacheDir);
+        //发送接收 udp
         this.pushReceiver = new PushReceiver(this);
+        //实例编号通知
         this.notifier = new InstancesChangeNotifier();
 
         NotifyCenter.registerToPublisher(InstancesChangeEvent.class, 16384);
@@ -175,7 +178,7 @@ public class HostReactor implements Closeable {
                 NAMING_LOGGER.warn("out of date data received, old-t: " + oldService.getLastRefTime() + ", new-t: "
                         + serviceInfo.getLastRefTime());
             }
-
+            //存到服务实例集合中
             serviceInfoMap.put(serviceInfo.getKey(), serviceInfo);
 
             Map<String, Instance> oldHostMap = new HashMap<String, Instance>(oldService.getHosts().size());
@@ -378,7 +381,7 @@ public class HostReactor implements Closeable {
     public void updateService(String serviceName, String clusters) throws NacosException {
         ServiceInfo oldService = getServiceInfo0(serviceName, clusters);
         try {
-
+            //传过去udp 端口 以及本udp 服务地址
             String result = serverProxy.queryList(serviceName, clusters, pushReceiver.getUdpPort(), false);
 
             if (StringUtils.isNotEmpty(result)) {
@@ -418,6 +421,10 @@ public class HostReactor implements Closeable {
         NAMING_LOGGER.info("{} do shutdown stop", className);
     }
 
+    /**
+     * 变更线程
+     * 每 10秒重试一次
+     */
     public class UpdateTask implements Runnable {
 
         long lastRefTime = Long.MAX_VALUE;

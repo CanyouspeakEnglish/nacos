@@ -737,7 +737,7 @@ public class InstanceController {
         }
 
         double threshold = service.getProtectThreshold();
-
+        //保护阈值
         if ((float) ipMap.get(Boolean.TRUE).size() / srvedIPs.size() <= threshold) {
 
             Loggers.SRV_LOG.warn("protect threshold reached, return all ips, service: {}", serviceName);

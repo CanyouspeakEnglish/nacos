@@ -94,7 +94,7 @@ public class NacosNamingService implements NamingService {
         InitUtils.initWebRootContext(properties);
         initCacheDir();
         initLogName(properties);
-
+        //连接代理
         this.serverProxy = new NamingProxy(this.namespace, this.endpoint, this.serverList, properties);
         this.beatReactor = new BeatReactor(this.serverProxy, initClientBeatThreadCount(properties));
         this.hostReactor = new HostReactor(this.serverProxy, beatReactor, this.cacheDir, isLoadCacheAtStart(properties),

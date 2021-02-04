@@ -48,7 +48,7 @@ public class ConfigChangeHandlerTest {
     public void testConfig(){
 
         try {
-            NamingService namingService = NacosFactory.createNamingService("118.190.155.155:8848");
+           /* NamingService namingService = NacosFactory.createNamingService("118.190.155.155:8848");
             namingService.registerInstance("test","192.168.1.1",8000);
             namingService.registerInstance("test","test","192.168.1.1",8000);
             namingService.subscribe("test",(v)->{
@@ -56,11 +56,12 @@ public class ConfigChangeHandlerTest {
                 System.out.println(namingEvent.getServiceName());
 
             });
-            namingService.getAllInstances("test");
+            namingService.getAllInstances("test");*/
 
             ConfigService configService = NacosFactory.createConfigService("118.190.155.155:8848");
-            configService.getConfig("com.lzx.test.config","lzx-group",10000);
-            configService.addListener("com.lzx.test.config", "lzx-group", new Listener() {
+            String config = configService.getConfig("com.lzx.test.config", "lzx-group", 10000);
+            System.out.println(config);
+           /* configService.addListener("com.lzx.test.config", "lzx-group", new Listener() {
                 @Override
                 public Executor getExecutor() {
                     return null;
@@ -70,7 +71,7 @@ public class ConfigChangeHandlerTest {
                 public void receiveConfigInfo(String configInfo) {
                     System.out.println("--------------------"+configInfo);
                 }
-            });
+            });*/
             System.in.read();
         } catch (NacosException e) {
             e.printStackTrace();
